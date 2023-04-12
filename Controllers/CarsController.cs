@@ -8,15 +8,16 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class CarsController : ControllerBase
     {
+
         // GET: api/<CarsController>
         [HttpGet]
         public IEnumerable<Car> Get()
         {
             List<Car> cars = new List<Car>
     {
-        new Car { Maker = "Toyota", Model = "Camry", Year = 2022, Body = "Sedan" },
-        new Car { Maker = "Honda", Model = "Civic", Year = 2021, Body = "Coupe" },
-        new Car { Maker = "Ford", Model = "Mustang", Year = 2020, Body = "Convertible" }
+        new Car { Maker = "Toyota", Model = "Camry", Year = 2022, Body = "Sedan", Engine="V6" },
+        new Car { Maker = "Honda", Model = "Civic", Year = 2021, Body = "Coupe", Engine="2.0" },
+        new Car { Maker = "Ford", Model = "Mustang", Year = 2020, Body = "Convertible", Engine="V8" }
     };
             return cars;
         }
@@ -44,12 +45,42 @@ namespace WebApplication1.Controllers
         public void Delete(int id)
         {
         }
+
+        private readonly IManagementCars _managementCars;
+
+        public CarsController(IManagementCars managementCars)
+        {
+            _managementCars = managementCars;
+        }
+
     }
-    public class Car
+    public class Car : IManagementCars
     {
         public string Maker { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }
         public string Body { get; set; }
+        public string Engine { get; set; }
+
+        public async Task<string> GetCarName()
+        {
+            return await Task.FromResult(Maker + " " + Model);
+        }
+
+        public async Task<string> GetCarEngine()
+        {
+            return await Task.FromResult(Engine);
+        }
+
+        public async Task<int> GetCarAge()
+        {
+            return await Task.FromResult(DateTime.Now.Year - Year);
+        }
+    }
+    public interface IManagementCars
+    {
+        Task<string> GetCarName();
+        Task<string> GetCarEngine();
+        Task<int> GetCarAge();
     }
 }
